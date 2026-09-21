@@ -1,0 +1,551 @@
+<title>Radiografía del MCP-Odoo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#EDEFF3;
+  --surface:#FFFFFF;
+  --surface-2:#F5F6FA;
+  --ink:#151826;
+  --ink-2:#39405A;
+  --muted:#5D6580;
+  --rule:#D6DAE4;
+  --rule-strong:#B9C0D0;
+  --accent:#2F4B94;
+  --ok:#0F7A55;
+  --warn:#C08400;
+  --bad:#B4231C;
+  --shadow:0 1px 2px rgba(21,24,38,.06);
+
+  --step--1:.8125rem;
+  --step-0:.9375rem;
+  --step-1:1.0625rem;
+  --step-2:1.375rem;
+  --step-3:1.875rem;
+  --step-4:2.75rem;
+
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1119;
+    --surface:#171A26;
+    --surface-2:#1D2131;
+    --ink:#E7EAF3;
+    --ink-2:#C3C9DB;
+    --muted:#98A0B8;
+    --rule:#272C3D;
+    --rule-strong:#3A4157;
+    --accent:#96ABEE;
+    --ok:#3FC496;
+    --warn:#D8A62F;
+    --bad:#FF8178;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1119;
+  --surface:#171A26;
+  --surface-2:#1D2131;
+  --ink:#E7EAF3;
+  --ink-2:#C3C9DB;
+  --muted:#98A0B8;
+  --rule:#272C3D;
+  --rule-strong:#3A4157;
+  --accent:#96ABEE;
+  --ok:#3FC496;
+  --warn:#D8A62F;
+  --bad:#FF8178;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:var(--step-0);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+*{box-sizing:border-box;}
+h1,h2,h3{text-wrap:balance;margin:0;font-family:var(--display);font-weight:700;letter-spacing:-.015em;line-height:1.12;}
+p{margin:0;}
+a{color:var(--accent);}
+
+.bar{
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:30;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.bar-in{
+  max-width:1120px;margin:0 auto;
+  padding-block:.6rem;padding-left:20px;padding-right:20px;
+  display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;justify-content:space-between;
+}
+.bar-name{font-family:var(--display);font-weight:700;font-size:var(--step-0);letter-spacing:-.01em;}
+.stamp{font-family:var(--mono);font-size:.6875rem;color:var(--muted);letter-spacing:.01em;}
+
+.wrap{max-width:1120px;margin:0 auto;padding-left:20px;padding-right:20px;padding-block:0 4rem;}
+
+.hero{padding-block:3rem 2rem;border-bottom:1px solid var(--rule);}
+.eyebrow{
+  font-family:var(--mono);font-size:.6875rem;text-transform:uppercase;
+  letter-spacing:.14em;color:var(--accent);margin-bottom:.9rem;
+}
+h1{font-size:var(--step-4);max-width:17ch;}
+.lede{margin-top:1.1rem;max-width:62ch;font-size:var(--step-1);color:var(--ink-2);}
+.lede strong{font-weight:600;color:var(--ink);}
+
+.kpis{
+  margin-top:2.25rem;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:3px;overflow:hidden;
+}
+.kpi{background:var(--surface);padding:1rem 1.1rem;}
+.kpi-n{
+  font-family:var(--display);font-weight:700;font-size:var(--step-3);
+  font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.02em;
+}
+.kpi-l{margin-top:.45rem;font-size:var(--step--1);color:var(--muted);line-height:1.35;}
+.kpi.is-ok .kpi-n{color:var(--ok);}
+.kpi.is-warn .kpi-n{color:var(--warn);}
+.kpi.is-bad .kpi-n{color:var(--bad);}
+
+section{padding-block:2.75rem;border-bottom:1px solid var(--rule);}
+section:last-of-type{border-bottom:0;}
+.sec-label{
+  font-family:var(--mono);font-size:.6875rem;text-transform:uppercase;
+  letter-spacing:.14em;color:var(--muted);margin-bottom:.6rem;
+}
+h2{font-size:var(--step-3);max-width:20ch;}
+.sec-intro{margin-top:.85rem;max-width:62ch;color:var(--ink-2);}
+
+/* ---------- medidores de cobertura ---------- */
+.legend{display:flex;gap:1.25rem;flex-wrap:wrap;margin-top:1.5rem;}
+.legend span{display:flex;align-items:center;gap:.4rem;font-size:var(--step--1);color:var(--muted);}
+.dot{width:10px;height:10px;border-radius:2px;flex:none;}
+.dot.ok{background:var(--ok);}
+.dot.warn{background:var(--warn);}
+.dot.bad{background:var(--bad);}
+
+.flows{margin-top:1.4rem;display:flex;flex-direction:column;gap:1.4rem;}
+.flow-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;}
+.flow-name{font-weight:600;}
+.flow-count{font-family:var(--mono);font-size:var(--step--1);color:var(--muted);font-variant-numeric:tabular-nums;}
+.meter{display:flex;gap:2px;margin-top:.5rem;height:22px;}
+.meter i{display:block;border-radius:2px;}
+.meter i.ok{background:var(--ok);}
+.meter i.warn{background:var(--warn);}
+.meter i.bad{background:var(--bad);}
+.flow-note{margin-top:.5rem;font-size:var(--step--1);color:var(--muted);max-width:66ch;}
+
+/* ---------- inventario ---------- */
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.75rem;}
+.filters button{
+  font:inherit;font-size:var(--step--1);
+  background:var(--surface);color:var(--ink-2);
+  border:1px solid var(--rule-strong);border-radius:999px;
+  padding:.3rem .85rem;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.45rem;
+  transition:background .12s ease,color .12s ease,border-color .12s ease;
+}
+.filters button:hover{border-color:var(--accent);}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.filters button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.filters b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums;opacity:.65;}
+
+.ledger{margin-top:1.5rem;}
+.group{margin-top:1.75rem;}
+.group:first-child{margin-top:0;}
+.group > h3{
+  font-family:var(--mono);font-weight:500;font-size:.6875rem;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--muted);
+  padding-bottom:.5rem;border-bottom:1px solid var(--rule-strong);
+}
+.row{
+  display:grid;grid-template-columns:7.5rem 15rem 1fr;
+  gap:.35rem 1.25rem;align-items:start;
+  padding-block:.85rem;border-bottom:1px solid var(--rule);
+}
+.row[hidden]{display:none;}
+.chip{
+  justify-self:start;
+  font-family:var(--mono);font-size:.6875rem;letter-spacing:.02em;
+  padding:.15rem .5rem;border-radius:3px;white-space:nowrap;
+  border:1px solid;
+}
+.chip.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent);background:color-mix(in srgb,var(--ok) 10%,transparent);}
+.chip.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent);}
+.chip.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent);background:color-mix(in srgb,var(--bad) 10%,transparent);}
+.chip.none{color:var(--muted);border-color:var(--rule-strong);background:var(--surface-2);}
+.row-name{font-weight:500;}
+.row-note{color:var(--muted);font-size:var(--step--1);}
+code{
+  font-family:var(--mono);font-size:.8em;
+  background:var(--surface-2);border:1px solid var(--rule);
+  padding:.05em .3em;border-radius:3px;color:var(--ink-2);
+  word-break:break-word;
+}
+.empty{padding-block:2rem;color:var(--muted);font-size:var(--step--1);}
+
+/* ---------- trampas ---------- */
+.traps{margin-top:1.75rem;display:flex;flex-direction:column;gap:.75rem;}
+.trap{
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  border-left:3px solid var(--rule-strong);
+  padding:1rem 1.15rem;box-shadow:var(--shadow);
+}
+.trap.sev-3{border-left-color:var(--bad);}
+.trap.sev-2{border-left-color:var(--warn);}
+.trap.sev-1{border-left-color:var(--rule-strong);}
+.trap-head{display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap;}
+.sev{font-family:var(--mono);font-size:.625rem;text-transform:uppercase;letter-spacing:.12em;}
+.sev-3 .sev{color:var(--bad);}
+.sev-2 .sev{color:var(--warn);}
+.sev-1 .sev{color:var(--muted);}
+.trap h4{margin:0;font-family:var(--sans);font-size:var(--step-0);font-weight:600;}
+.trap p{margin-top:.4rem;font-size:var(--step--1);color:var(--ink-2);max-width:78ch;}
+
+/* ---------- plan ---------- */
+.table-scroll{overflow-x:auto;margin-top:1.5rem;-webkit-overflow-scrolling:touch;}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:var(--step--1);}
+caption{text-align:left;color:var(--muted);font-size:var(--step--1);padding-bottom:.6rem;}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--rule);vertical-align:top;}
+thead th{
+  font-family:var(--mono);font-weight:500;font-size:.6875rem;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--rule-strong);
+}
+tbody tr:hover{background:var(--surface-2);}
+td:first-child{font-weight:500;color:var(--ink);}
+.cost{font-family:var(--mono);font-size:.6875rem;white-space:nowrap;}
+.cost.cheap{color:var(--ok);}
+.cost.mid{color:var(--warn);}
+.cost.heavy{color:var(--bad);}
+.phase{
+  font-family:var(--mono);font-size:.6875rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--accent);padding-top:1.4rem;
+}
+
+/* ---------- fuera del mcp ---------- */
+.outside{margin-top:1.5rem;display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;}
+.out{background:var(--surface);padding:1.1rem 1.2rem;}
+.out h4{margin:0;font-family:var(--sans);font-size:var(--step-0);font-weight:600;}
+.out p{margin-top:.35rem;font-size:var(--step--1);color:var(--muted);}
+
+footer{padding-block:2rem 0;color:var(--muted);font-size:var(--step--1);max-width:70ch;}
+footer p + p{margin-top:.6rem;}
+
+@media (max-width:860px){
+  .kpis{grid-template-columns:repeat(2,1fr);}
+  .row{grid-template-columns:6.5rem 1fr;}
+  .row .row-note{grid-column:2/-1;}
+}
+@media (max-width:620px){
+  :root{--step-4:2.125rem;--step-3:1.5rem;}
+  .fix{grid-template-columns:1fr;}
+  .outside{grid-template-columns:1fr;}
+  .row{grid-template-columns:1fr;gap:.3rem;}
+  .row .row-note{grid-column:auto;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;}
+}
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <span class="bar-name">Radiografía del MCP-Odoo</span>
+    <span class="stamp">rama mcp-odoo-v2 · sha b4b582c · db_pragmatic · 21 sep 2026</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Consultorio médico y odontológico · verificado contra el código</div>
+    <h1>Qué puede y qué no puede hacer hoy el MCP</h1>
+    <p class="lede">El servidor expone <strong>26 herramientas</strong> sobre Odoo y resuelve bien el núcleo transaccional del consultorio: encontrar a un paciente, calcular huecos, agendar y cancelar. Lo que piden los tres flujos del bot de WhatsApp es aproximadamente el doble. Esta página separa lo que ya funciona, lo que funciona con reservas, lo que está roto y lo que sencillamente no existe — con el archivo y la línea donde se verificó cada cosa.</p>
+
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-n">26</div><div class="kpi-l">herramientas expuestas<br>(25 en <code>scheduling.py</code> + 1 en <code>server.py</code>)</div></div>
+      <div class="kpi is-ok"><div class="kpi-n">12</div><div class="kpi-l">capacidades listas para usar tal cual</div></div>
+      <div class="kpi is-warn"><div class="kpi-n">5</div><div class="kpi-l">con reservas o rotas: funcionan, pero no como el flujo asume</div></div>
+      <div class="kpi is-bad"><div class="kpi-n">19</div><div class="kpi-l">que los flujos necesitan y no existen</div></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-label">Cobertura</div>
+    <h2>Los tres flujos, medidos contra lo que hay</h2>
+    <p class="sec-intro">Cada barra cuenta los pasos del diagrama que dependen del MCP. El panel del profesional y la recepción virtual se apoyan casi por completo en piezas que todavía no existen.</p>
+
+    <div class="legend">
+      <span><i class="dot ok"></i>Cubierto</span>
+      <span><i class="dot warn"></i>Parcial o con reservas</span>
+      <span><i class="dot bad"></i>Sin cubrir</span>
+    </div>
+
+    <div class="flows">
+      <div class="flow">
+        <div class="flow-head">
+          <span class="flow-name">Flujo paciente — agendar por WhatsApp</span>
+          <span class="flow-count">3 · 3 · 9 de 15</span>
+        </div>
+        <div class="meter" role="img" aria-label="3 pasos cubiertos, 3 parciales, 9 sin cubrir de 15">
+          <i class="ok" style="width:20%"></i><i class="warn" style="width:20%"></i><i class="bad" style="width:60%"></i>
+        </div>
+        <p class="flow-note">Agendar y cancelar están resueltos. Procedimientos con su duración, preferencias, recordatorios, confirmación de asistencia e indicaciones post-procedimiento no tienen ningún respaldo en el MCP.</p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-head">
+          <span class="flow-name">Panel del profesional</span>
+          <span class="flow-count">2 · 3 · 7 de 12</span>
+        </div>
+        <div class="meter" role="img" aria-label="2 pasos cubiertos, 3 parciales, 7 sin cubrir de 12">
+          <i class="ok" style="width:16.6%"></i><i class="warn" style="width:25%"></i><i class="bad" style="width:58.4%"></i>
+        </div>
+        <p class="flow-note">Consultar la agenda del día es lo mejor cubierto de todo el servidor. Bloquear un día de ausencia, reprogramar en lote y avisar a los pacientes afectados no existen.</p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-head">
+          <span class="flow-name">Recepción virtual — memoria y FAQs</span>
+          <span class="flow-count">1 · 1 · 4 de 6</span>
+        </div>
+        <div class="meter" role="img" aria-label="1 paso cubierto, 1 parcial, 4 sin cubrir de 6">
+          <i class="ok" style="width:16.6%"></i><i class="warn" style="width:16.7%"></i><i class="bad" style="width:66.7%"></i>
+        </div>
+        <p class="flow-note">Este flujo casi no toca el MCP: memoria conversacional y base de conocimiento son piezas del bot, no del servidor.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">Inventario</div>
+    <h2>Capacidad por capacidad</h2>
+    <p class="sec-intro">36 capacidades que los flujos dan por sentadas, con el veredicto verificado en el código. Filtra por estado para ver solo lo que te interesa.</p>
+
+    <div class="filters" role="group" aria-label="Filtrar por estado">
+      <button type="button" id="f-all" data-filter="all" aria-pressed="true">Todo <b>36</b></button>
+      <button type="button" id="f-ok" data-filter="ok" aria-pressed="false">Funciona <b>12</b></button>
+      <button type="button" id="f-warn" data-filter="warn" aria-pressed="false">Con reservas <b>4</b></button>
+      <button type="button" id="f-bad" data-filter="bad" aria-pressed="false">Roto <b>1</b></button>
+      <button type="button" id="f-none" data-filter="none" aria-pressed="false">No existe <b>19</b></button>
+    </div>
+
+    <div class="ledger" id="ledger">
+
+      <div class="group">
+        <h3>Identificar y registrar personas</h3>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Buscar paciente por teléfono</span><span class="row-note"><code>search_user_by_phone</code> normaliza el número antes de buscar en móvil o fijo. Es la puerta de entrada del bot — y también su punto débil de privacidad.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Buscar por correo</span><span class="row-note"><code>search_user_by_email</code> busca en <code>res.users</code> y cae a <code>res.partner</code>.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Registrar paciente nuevo</span><span class="row-note"><code>create_patient</code> exige tipo y número de documento; si ya existe, reutiliza el registro en vez de duplicarlo. Los sinónimos de cédula, CE y TI salen de <code>latam_id_synonyms.json</code>.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Crear personal clínico</span><span class="row-note"><code>create_user</code> crea contacto, usuario y empleado opcional. <code>create_medical_staff</code> es literalmente la misma función (<code>scheduling.py:2205</code>).</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Verificar la identidad del paciente</span><span class="row-note">El bot da por cierto que quien escribe desde un número es el dueño de ese número. No hay confirmación con documento ni código de un solo uso antes de mostrar citas.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Perfiles de acceso por rol</span><span class="row-note">El único control es un gate binario de token (<code>http_server.py:47-85</code>). No hay roles ni scopes: quien pasa el token puede llamar las 26 herramientas, incluidas las que escriben.</span></div>
+      </div>
+
+      <div class="group">
+        <h3>Ver la agenda</h3>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Agenda del día por turno</span><span class="row-note"><code>list_appointments_by_shift</code> con <code>am</code>, <code>pm</code> o el día completo.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Citas por estado</span><span class="row-note"><code>list_events_by_stage</code> con paginación, más <code>list_event_stages</code> para resolver los IDs reales antes de filtrar.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Buscar citas con filtros</span><span class="row-note"><code>search_calendar_events</code> combina profesional, rango de fechas y estado.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Historial de citas de un paciente</span><span class="row-note"><code>list_patient_appointments</code> lo ubica por teléfono y lista todo donde aparece como asistente.</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Horario laboral de un profesional</span><span class="row-note"><code>get_doctor_working_hours</code>, siempre que el usuario tenga <code>hr.employee</code> con calendario de recursos configurado.</span></div>
+        <div class="row" data-state="warn"><span class="chip warn">Con reservas</span><span class="row-name">Citas por especialidad</span><span class="row-note"><code>list_events_by_specialty</code> hace una búsqueda parcial sobre el <em>nombre del evento</em>, no sobre la especialidad real del profesional. Una cita de ortodoncia titulada «Control Juan P.» no aparece en el listado de ortodoncia.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Turnos de todo el equipo de una vez</span><span class="row-note">Hay que iterar profesional por profesional desde el bot. Es barato de componer, pero no hay una sola llamada que lo resuelva.</span></div>
+      </div>
+
+      <div class="group">
+        <h3>Disponibilidad y reserva</h3>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Disponibilidad semanal de un profesional</span><span class="row-note"><code>get_doctor_weekly_availability</code> cruza horario laboral con citas ya agendadas.</span></div>
+        <div class="row" data-state="warn"><span class="chip warn">Con reservas</span><span class="row-name">Huecos de un profesional en un día</span><span class="row-note"><code>get_doctor_available_slots</code> funciona, pero arrastra un comentario «para depuración» en <code>scheduling.py:1867</code>: pruébalo con un caso real antes de construir encima.</span></div>
+        <div class="row" data-state="warn"><span class="chip warn">Con reservas</span><span class="row-name">Agendar respetando disponibilidad</span><span class="row-note"><code>book_appointment_with_doctor</code> sí valida el solape, pero es <em>check-then-act</em> sin lock ni transacción (<code>scheduling.py:386-429</code>, <code>2003-2013</code>). Dos pacientes simultáneos se llevan el mismo hueco.</span></div>
+        <div class="row" data-state="warn"><span class="chip warn">Con reservas</span><span class="row-name">Crear un evento a mano</span><span class="row-note"><code>create_calendar_event</code> trae <code>check_availability=False</code> por defecto en el modelo Pydantic. Llamada tal cual por el bot, crea citas solapadas sin avisar.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Agendar por ID de profesional</span><span class="row-note"><code>AppointmentRequest</code> solo acepta <code>doctor_name</code> (<code>schemas.py:105-120</code>) y rechaza la petición si hay cero o más de una coincidencia. Dos odontólogos que compartan apellido bastan para trabar el flujo.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Huecos de cualquier profesional de una especialidad</span><span class="row-note">Cada función de disponibilidad pide un <code>doctor_user_id</code>. Los «mínimo 3 horarios» del flujo salen de N llamadas ordenadas a mano por el bot.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Reservar un cupo temporalmente</span><span class="row-note">Ningún concepto de <em>hold</em> con expiración. Sin esto, la ventana de 30 minutos de los cupos liberados no se puede sostener.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Catálogo de procedimientos con duración</span><span class="row-note">Cero referencias a <code>product.*</code>. Una limpieza de 40 minutos, una resina de 60 y un control de ortodoncia de 20 son todas «una cita» para el servidor: <code>duration_hours</code> llega desde afuera, no desde el procedimiento.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Consultorio o unidad asignada</span><span class="row-note">El «Lugar» que promete el mensaje de confirmación no sale en ninguna respuesta del servidor. Tampoco hay forma de evitar que dos profesionales coincidan en la misma unidad.</span></div>
+      </div>
+
+      <div class="group">
+        <h3>Cambiar y cerrar citas</h3>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Cancelar con motivo e historial</span><span class="row-note">Lo mejor resuelto del servidor: <code>cancel_calendar_event</code> no borra, cambia el estado, anota el motivo y deja mensaje en el historial. Es la única función que busca el estado «Cancelado» por nombre en vez de confiar en un ID fijo (<code>scheduling.py:990-997</code>).</span></div>
+        <div class="row" data-state="ok"><span class="chip ok">Funciona</span><span class="row-name">Borrar una cita</span><span class="row-note">Deshabilitada a propósito (<code>scheduling.py:972-983</code>): responde error y obliga a cancelar, para no perder la trazabilidad. Es una barrera deliberada, no una carencia — y la correcta para un historial clínico.</span></div>
+        <div class="row" data-state="bad"><span class="chip bad">Roto</span><span class="row-name">Mover la hora de una cita</span><span class="row-note">El modelo acepta <code>start_datetime</code>/<code>stop_datetime</code> y los vuelca literalmente al <code>write</code> de Odoo (<code>scheduling.py:961-962</code>), que espera <code>start</code>/<code>stop</code>. Lo más probable es que reprogramar falle con un error genérico — y aunque pasara, esa ruta no convierte zona horaria. <strong>Pruébalo en vivo antes de construir el bot encima.</strong></span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Ventana mínima de antelación</span><span class="row-note"><code>update_calendar_event</code> solo valida que la cita no haya pasado (<code>scheduling.py:936-948</code>). Un paciente puede cancelar una cita que empieza en cinco minutos, sin dejar margen para llenar el cupo.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Bloquear días de ausencia</span><span class="row-note">Cero referencias a <code>resource.calendar.leaves</code>. Congresos, incapacidades y vacaciones no tienen dónde registrarse: el workaround de crear un evento choca con la regla de mínimo dos asistentes.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Reprogramar en lote</span><span class="row-note">Cada llamada opera sobre un <code>event_id</code>. No hay forma de mover las citas de un profesional en una fecha de una sola vez cuando se ausenta.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Marcar confirmado, atendido o no asistió</span><span class="row-note">En <code>db_pragmatic</code> solo hay tres estados reales: <em>Pending</em>, <em>Cancelled</em> y <em>Finished (Past Due)</em>. Sin un estado «Confirmado», el recordatorio de 24 h no tiene dónde escribir la respuesta — y sin «No asistió» no hay forma de medir el ausentismo.</span></div>
+      </div>
+
+      <div class="group">
+        <h3>Seguimiento clínico y relación con el paciente</h3>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Procedimiento realizado en la cita</span><span class="row-note">La cita guarda un nombre y una descripción libres, nada estructurado. El seguimiento post-procedimiento necesita saber <em>qué</em> se hizo para enviar las indicaciones correctas — una extracción y una limpieza no se cuidan igual.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Preferencias del paciente</span><span class="row-note">Ningún campo ni lógica de preferencias en <code>res.partner</code>. El «sueles preferir la tarde» no tiene dónde guardarse.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Lista de espera y cupos liberados</span><span class="row-note">El hueco más grande del proyecto: necesita lista de espera, matching, <em>hold</em>, temporizador y canal saliente. Cinco piezas ausentes a la vez.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Pacientes sin control reciente</span><span class="row-note">No hay consulta agregada del tipo «sin cita en los últimos seis meses», que es justo el ciclo de un control odontológico. Se resuelve con una función nueva, sin modelo nuevo.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Solicitudes para un asesor</span><span class="row-note">Cero referencias a <code>crm.lead</code> en el repo. Se puede guardar el contacto, pero la solicitud en sí no queda registrada en ninguna parte.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Recordatorios y mensajes programados</span><span class="row-note">Cero cron, scheduler, colas de trabajo o webhooks salientes. El servidor solo habla cuando un cliente MCP le pregunta.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Seguimiento post-procedimiento</span><span class="row-note">Depende de lo anterior: sin temporizador ni canal saliente no hay mensajes diarios, y sin procedimiento registrado no hay indicaciones que enviar ni umbral para escalar una complicación.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Memoria conversacional</span><span class="row-note">El «la última vez hablamos el…» vive en el bot, no aquí. No es una carencia del MCP, pero hoy no existe en ninguna parte.</span></div>
+        <div class="row" data-state="none"><span class="chip none">No existe</span><span class="row-name">Base de conocimiento para FAQs</span><span class="row-note">Horarios, políticas de cancelación, medios de pago y convenios no están modelados. Tampoco hay tarifas en ningún sitio.</span></div>
+      </div>
+
+      <p class="empty" id="empty" hidden>Nada en este estado.</p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="sec-label">Trampas</div>
+    <h2>Lo que ya está y va a romperse en producción</h2>
+    <p class="sec-intro">No son funciones que falten: es código que existe hoy y que los flujos van a ejercitar de formas que el servidor no aguanta.</p>
+
+    <div class="traps">
+      <div class="trap sev-3">
+        <div class="trap-head"><span class="sev">Crítico</span><h4>Cualquiera con un número de teléfono ve las citas de otro</h4></div>
+        <p>El bot identifica al paciente por el número desde el que escribe y <code>list_patient_appointments</code> devuelve sus citas sin ninguna verificación adicional. Un número reasignado, un teléfono prestado o una llamada directa a la API con el número de un tercero exponen información de salud: con quién se atiende, cuándo y de qué. Antes de abrir la URL al público hace falta confirmar identidad — documento o código de un solo uso — y conviene revisar el diseño con quien lleve el tema de protección de datos del consultorio.</p>
+      </div>
+      <div class="trap sev-3">
+        <div class="trap-head"><span class="sev">Crítico</span><h4>Doble reserva del mismo horario</h4></div>
+        <p>Consultar y crear son dos operaciones separadas sin lock ni idempotencia, y la validación está apagada por defecto en <code>create_calendar_event</code>. Dos pacientes que piden el mismo horario a la vez lo obtienen los dos. En el flujo de cupos liberados esto es el diseño mismo: el cupo se ofrece a varias personas a la vez.</p>
+      </div>
+      <div class="trap sev-3">
+        <div class="trap-head"><span class="sev">Crítico</span><h4>Reprogramar apunta a campos que Odoo no tiene</h4></div>
+        <p><code>update_calendar_event</code> escribe <code>start_datetime</code>/<code>stop_datetime</code> donde el modelo <code>calendar.event</code> usa <code>start</code>/<code>stop</code>, y el error vuelve envuelto en un <code>success:false</code> genérico. Verifícalo contra <code>db_pragmatic</code> antes que cualquier otra cosa: si se confirma, «modificar cita» no funciona hoy.</p>
+      </div>
+      <div class="trap sev-2">
+        <div class="trap-head"><span class="sev">Alto</span><h4>Un solo token abre todo el servidor</h4></div>
+        <p>El mismo conjunto de herramientas que usaría un paciente incluye <code>create_user</code>, <code>update_user_company</code> y <code>cancel_calendar_event</code>. Para un bot público hacen falta al menos dos perfiles — paciente y profesional — antes de exponer la URL.</p>
+      </div>
+      <div class="trap sev-2">
+        <div class="trap-head"><span class="sev">Alto</span><h4>Los IDs de estado asumidos se vuelven trampa al añadir «Confirmado»</h4></div>
+        <p>El <code>1</code> y el <code>2</code> están fijos en cuatro sitios (<code>scheduling.py:400</code>, <code>600</code>, <code>1898</code>, <code>2433</code>). Hoy coinciden con la realidad, pero en cuanto se agregue un cuarto estado para la confirmación de asistencia, cualquier reordenamiento asigna estados equivocados sin un solo error. La solución ya está escrita en <code>cancel_calendar_event</code>: resolver por nombre.</p>
+      </div>
+      <div class="trap sev-2">
+        <div class="trap-head"><span class="sev">Alto</span><h4>Cancelaciones de último minuto sin margen</h4></div>
+        <p>Como no hay ventana mínima de antelación, el bot acepta una cancelación a cinco minutos de la cita. En un consultorio eso es una silla vacía que ya no se puede llenar, y es precisamente el caso que el flujo de cupos liberados pretende resolver.</p>
+      </div>
+      <div class="trap sev-1">
+        <div class="trap-head"><span class="sev">Medio</span><h4>Agendar solo por nombre del profesional</h4></div>
+        <p>Cero o dos coincidencias y la petición se rechaza. Es tolerable con cuatro profesionales de apellidos distintos; se cae en cuanto entren dos que compartan apellido o el paciente escriba solo «Dr. García».</p>
+      </div>
+      <div class="trap sev-1">
+        <div class="trap-head"><span class="sev">Medio</span><h4>Un timeout tumba la llamada</h4></div>
+        <p>El único reintento se dispara cuando el mensaje de error contiene «session expired» o «not logged» (<code>odoo/client.py:177-191</code>). Cualquier otro error transitorio se relanza de inmediato, sin backoff.</p>
+      </div>
+      <div class="trap sev-1">
+        <div class="trap-head"><span class="sev">Medio</span><h4>Herramienta duplicada</h4></div>
+        <p><code>create_medical_staff</code> devuelve <code>create_user</code> sin una línea propia. Es ruido para el modelo que tiene que elegir qué herramienta llamar: elimínala o márcala como obsoleta.</p>
+      </div>
+      <div class="trap sev-1">
+        <div class="trap-head"><span class="sev">Bajo</span><h4>Bogotá está fija en el código</h4></div>
+        <p>Una sola constante (<code>scheduling.py:33</code>), pero seis puntos de uso repartidos por el archivo. Irrelevante mientras haya una sola sede en Colombia; a tener en cuenta si se abre otra.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">Plan</div>
+    <h2>Qué falta, por orden de urgencia</h2>
+    <p class="sec-intro">El coste indica si se resuelve con lo que ya hay o si exige tocar Odoo. Nada de la primera fase requiere un modelo nuevo.</p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Coste: <span class="cost cheap">barato</span> = parche sobre el código actual · <span class="cost mid">medio</span> = función o configuración nueva · <span class="cost heavy">alto</span> = modelo nuevo en Odoo</caption>
+        <thead>
+          <tr><th scope="col">Qué</th><th scope="col">Por qué ahora</th><th scope="col">Coste</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="3" class="phase">Antes de escribir una línea del bot</td></tr>
+          <tr><td>Probar y arreglar <code>update_calendar_event</code></td><td>Traducir <code>start_datetime</code> a <code>start</code> y aplicar la conversión de zona horaria. Sin esto no hay «modificar cita».</td><td class="cost cheap">barato</td></tr>
+          <tr><td>Verificar identidad antes de mostrar citas</td><td>El número de WhatsApp no basta para entregar información de salud. Documento o código de un solo uso.</td><td class="cost mid">medio</td></tr>
+          <tr><td>Separar perfiles de herramientas</td><td>Paciente y profesional no pueden compartir el mismo token con acceso a las 26.</td><td class="cost mid">medio</td></tr>
+          <tr><td>Encender la validación de solape</td><td>Poner <code>check_availability</code> en <code>True</code> por defecto, o prohibirle al bot usar <code>create_calendar_event</code>.</td><td class="cost cheap">barato</td></tr>
+          <tr><td>Aceptar <code>doctor_user_id</code> al agendar</td><td>Elimina el fallo por apellido ambiguo, que aparece en cuanto crece el equipo.</td><td class="cost cheap">barato</td></tr>
+          <tr><td>Resolver los estados por nombre</td><td>Replicar en todas las funciones lo que ya hace <code>cancel_calendar_event</code>, antes de añadir un cuarto estado.</td><td class="cost cheap">barato</td></tr>
+
+          <tr><td colspan="3" class="phase">Para que los flujos 1 y 2 funcionen de punta a punta</td></tr>
+          <tr><td>Estado «Confirmado» y «No asistió»</td><td>Es lo que hace útil el recordatorio de 24 h y la confirmación masiva, y lo único que permite medir ausentismo. Estados nuevos en Odoo, sin modelo nuevo.</td><td class="cost cheap">barato</td></tr>
+          <tr><td>Ventana mínima de antelación</td><td>Una validación de horas sobre la que ya existe. Protege la agenda y da margen para ofrecer el cupo.</td><td class="cost cheap">barato</td></tr>
+          <tr><td>Reprogramación en lote</td><td>Un bucle sobre la función de modificar — en cuanto esté arreglada.</td><td class="cost cheap">barato</td></tr>
+          <tr><td>Disponibilidad agregada por especialidad</td><td>Los «3 horarios» se pueden componer hoy iterando desde el bot; una función propia evita el N+1.</td><td class="cost mid">medio</td></tr>
+          <tr><td>Turnos del equipo en una llamada</td><td>Igual: iterable hoy, conveniente como función.</td><td class="cost mid">medio</td></tr>
+          <tr><td>Bloqueo de agenda por ausencia</td><td>Congresos, incapacidades y vacaciones. Usar <code>resource.calendar.leaves</code> de RRHH o relajar la regla de dos asistentes.</td><td class="cost mid">medio</td></tr>
+          <tr><td>Catálogo de procedimientos</td><td>Duración real y profesionales habilitados por procedimiento. Sin esto, el bot no puede calcular cuánto dura una cita ni ofrecer un menú.</td><td class="cost heavy">alto</td></tr>
+
+          <tr><td colspan="3" class="phase">Fase 2 — cupos liberados y seguimiento clínico</td></tr>
+          <tr><td>Reserva temporal con expiración</td><td>Persistencia propia: no cabe en <code>calendar.event</code>. Es la pieza que sostiene la ventana de 30 minutos.</td><td class="cost heavy">alto</td></tr>
+          <tr><td>Lista de espera y matching</td><td>Modelo nuevo en Odoo. Junto con el punto anterior y el canal saliente, es el bloque más caro del proyecto.</td><td class="cost heavy">alto</td></tr>
+          <tr><td>Procedimiento registrado en la cita</td><td>Sin saber qué se hizo, el seguimiento post-procedimiento no puede enviar las indicaciones correctas.</td><td class="cost heavy">alto</td></tr>
+          <tr><td>Pacientes sin control reciente</td><td>Query agregada sobre <code>calendar.event</code> con el ciclo de seis meses: función nueva, sin modelo nuevo.</td><td class="cost mid">medio</td></tr>
+          <tr><td>Preferencias del paciente</td><td>Campo nuevo en <code>res.partner</code> para recordar mañana o tarde.</td><td class="cost heavy">alto</td></tr>
+          <tr><td>Consultorio o unidad</td><td>Campo nuevo, necesario para el «Lugar» del mensaje y para no cruzar dos profesionales en la misma silla.</td><td class="cost heavy">alto</td></tr>
+          <tr><td>Registro de solicitudes a asesor</td><td>Requiere instalar el módulo <code>crm</code> si no está.</td><td class="cost heavy">alto</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">Fuera del alcance</div>
+    <h2>Lo que no le toca al MCP y tampoco existe todavía</h2>
+    <p class="sec-intro">Estas cuatro piezas no son huecos del servidor: son infraestructura del bot que hoy no está en ninguna parte del proyecto.</p>
+
+    <div class="outside">
+      <div class="out"><h4>Scheduler y cola de trabajos</h4><p>Recordatorio de 24 h, indicaciones diarias post-procedimiento, resumen semanal y el temporizador de 30 minutos de los cupos. El MCP es request/response puro.</p></div>
+      <div class="out"><h4>Canal saliente</h4><p>Hoy el sistema solo puede responder, nunca iniciar. Sin WhatsApp o correo de salida, la mitad proactiva de los tres flujos no arranca.</p></div>
+      <div class="out"><h4>Base de conocimiento</h4><p>Horarios, políticas de cancelación, medios de pago y convenios. Las FAQs aparecen en los tres diagramas y no tienen fuente.</p></div>
+      <div class="out"><h4>Memoria conversacional</h4><p>El «hablamos el [fecha] sobre…» y el «retomando donde quedaste» necesitan histórico de chat y estado de sesión.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Verificado contra <code>resources/scheduling.py</code>, <code>resources/partners.py</code>, <code>resources/models/schemas.py</code>, <code>odoo/client.py</code>, <code>http_server.py</code>, <code>docs/agent/contracts.md</code>, <code>docs/agent/traps.md</code> y consulta directa a la tabla <code>calendar_event_stage</code> de <code>db_pragmatic</code>.</p>
+    <p>Las cuatro trampas documentadas en <code>traps.md</code> son exclusivamente de despliegue — imports rotos con <code>python -m</code>, <code>setup.py</code> con paquete inexistente, comando de arranque incorrecto y <code>.env</code> dependiente del directorio de ejecución. Ninguna toca la lógica de citas.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.filters button'));
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.row'));
+  var groups = Array.prototype.slice.call(document.querySelectorAll('.group'));
+  var empty = document.getElementById('empty');
+
+  function apply(state){
+    var shown = 0;
+    rows.forEach(function(row){
+      var match = (state === 'all') || (row.getAttribute('data-state') === state);
+      row.hidden = !match;
+      if (match) shown++;
+    });
+    groups.forEach(function(group){
+      var visible = group.querySelectorAll('.row:not([hidden])').length;
+      group.hidden = visible === 0;
+    });
+    empty.hidden = shown !== 0;
+    buttons.forEach(function(btn){
+      btn.setAttribute('aria-pressed', String(btn.getAttribute('data-filter') === state));
+    });
+  }
+
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      apply(btn.getAttribute('data-filter'));
+    });
+  });
+})();
+</script>
